@@ -1,8 +1,9 @@
 #include "test.h"
 #include "bucket_interface.h"
 #include "array_bucket.h"
+#include "linked_bucket.h"
 
-#define SETUP Bucket<int>* b{new ArrayBucket<int>}
+#define SETUP Bucket<int>* b{new LinkedBucket<int>}
 #define TEARDOWN delete b
 #define TEST_VALUE 5
 
