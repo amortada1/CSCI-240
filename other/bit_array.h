@@ -9,11 +9,13 @@ class BitArray
 public:
     BitArray(size_t);
     void setBit(size_t, bool);
-    void unsetBit(size_t);
     bool getBit(size_t) const;
     void setAll(bool);
 
 private:
+    void setBit(size_t);
+    void unsetBit(size_t);
+
     size_t byteQty;
     size_t bitQty;
     uint8_t* array;

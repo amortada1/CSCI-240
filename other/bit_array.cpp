@@ -9,6 +9,11 @@ BitArray::BitArray(size_t bitQty)
 
 void BitArray::setBit(size_t pos, bool state)
 {
+    state ? setBit(pos) : unsetBit(pos);
+}
+
+void BitArray::setBit(size_t pos)
+{
     size_t bytePos{pos >> 3};
     size_t bitPos{pos % 8};
 
