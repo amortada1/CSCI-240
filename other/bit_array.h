@@ -8,9 +8,11 @@ class BitArray
 {
 public:
     BitArray(size_t);
+    BitArray(size_t, bool);
     void setBit(size_t, bool);
     bool getBit(size_t) const;
-    void setAll(bool);
+    void clear(bool);
+    void clear(); // unsets all bits
 
 private:
     void setBit(size_t);
