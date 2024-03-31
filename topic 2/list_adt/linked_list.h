@@ -9,7 +9,6 @@ template<typename T>
 class LinkedList : public List<T>
 {
 public:
-    
     /* Constructor */
     LinkedList() : count{}, head{nullptr}, tail{nullptr} {}
     
