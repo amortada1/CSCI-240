@@ -7,5 +7,5 @@
 
 
 
-#endif /* LINKED_LIST */
+#endif /* ARRAY_LIST */
 
