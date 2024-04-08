@@ -123,7 +123,7 @@ private:
     void heapify(T array[], size_t size)
     {
         for (size_t finalParentNode = ceil((size - 1) / 2); finalParentNode > 0; --finalParentNode)
-            upHeap(finalParentNode);
+            downHeap(finalParentNode);
         
     }
     
