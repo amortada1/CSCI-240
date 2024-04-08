@@ -1,6 +1,5 @@
 #include <functional>
 #include <cmath>
-#include <iostream> // remove this later
 
 #include "heap.h"
 
@@ -33,10 +32,6 @@ public:
             ++count;
         }
 
-        std::cout << "Count: " << count << std::endl;
-        std::cout << "Store at count: " << store[count] << std::endl;
-        std::cout << "Root node: " << store[1] << std::endl;
-
         // run heapify on internal store to put it into minheap/maxheap order
         heapify(store, size);
     }
@@ -48,10 +43,6 @@ public:
         // add item to the end of the array
         if (count == currentSize) resize();
         store[++count] = item;
-
-        std::cout << "Count: " << count << std::endl;
-        std::cout << "Store at count: " << store[count] << std::endl;
-        std::cout << "Root node: " << store[1] << std::endl;
 
         // run upheap on store
         if (count == 1) upHeap(1);
@@ -79,7 +70,7 @@ private:
     size_t currentSize;
     size_t count;
     std::function<bool(const T&, const T&)> comparator;
-
+    
     void downHeap(const size_t parent)
     {
         // compare parent with both left and right child and swap if needed
@@ -111,24 +102,19 @@ private:
         size_t lChild = 2 * parent;
         size_t rChild = lChild + 1;
 
-        // std::cout << lChild << std::endl;
-        // std::cout << rChild << std::endl;
-        // std::cout << store[rChild] << std::endl;
-
         if (comparator(store[parent], store[lChild]))
         {
-            std::cout << "entered if statement :p" << std::endl;
             T temp = store[parent];
             store[parent] = store[lChild];
             store[lChild] = temp;
         }
 
-        // if (comparator(store[parent], store[rChild]))
-        // {
-        //     T temp = store[parent];
-        //     store[parent] = store[rChild];
-        //     store[rChild] = temp;
-        // }
+        if (comparator(store[parent], store[rChild]))
+        {
+            T temp = store[parent];
+            store[parent] = store[rChild];
+            store[rChild] = temp;
+        }
 
         // recursively call upheap function
         return upHeap(parent / 2);
@@ -136,12 +122,9 @@ private:
 
     void heapify(T array[], size_t size)
     {
-        std::cout << "heller" << std::endl;
         for (size_t finalParentNode = ceil((size - 1) / 2); finalParentNode > 0; --finalParentNode)
-        {
-            std::cout << finalParentNode << std::endl;
             upHeap(finalParentNode);
-        }
+        
     }
     
     void resize()
