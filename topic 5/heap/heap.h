@@ -3,8 +3,12 @@
 #ifndef HEAP_H
 #define HEAP_H
 
-#define DEFAULT_SIZE 432
+#define DEFAULT_SIZE 256
 #define ROOT 1
+
+/*
+    a > b yields a max heap
+*/
 
 template<typename T>
 class Heap
@@ -27,13 +31,11 @@ public:
 
     void add(const T& item) 
     {
-        if (count == currentSize) resize();
+        if (count >= currentSize - 1) resize();
         heap[++count] = item;
 
-        if (count > 1) upHeap(count >> 1);
+        if (count > 1) upHeap(count);
     }
-
-    T get() const {return heap[ROOT];}
 
     void remove() 
     {
@@ -41,9 +43,12 @@ public:
         downHeap(ROOT);
     }
 
+    T get() const {return heap[ROOT];}
+
     bool empty() const {return count == 0;}
 
     void clear() {count = 0;}
+
 private:
     size_t currentSize;
     size_t count;
@@ -56,12 +61,23 @@ private:
 
     void heapify()
     {
-        // TODO: implement
+        for (size_t parent = count >> 1; parent >= ROOT; --parent)
+            downHeap(parent);
     }
 
-    void upHeap(size_t parent)
+    void upHeap(size_t child)
     {
-        // TODO: implement
+        size_t parent{child << 1};
+        size_t extremaIdx;
+
+        if(child <= ROOT) return;
+        extremaIdx = extrema(parent, child);
+
+        if(extremaIdx != parent)
+        {
+            std::swap(heap[parent], heap[extremaIdx]);
+            upHeap(extremaIdx);
+        }
     }
     
     void downHeap(size_t parent)
@@ -76,7 +92,7 @@ private:
 
         // compare with right child (if it exists)
         ++child;
-        if (child <= count) extrema(extremaIdx, child);
+        if (child <= count) extremaIdx = extrema(extremaIdx, child);
 
         if (extremaIdx != parent)
         {
@@ -85,7 +101,19 @@ private:
         }
     }
 
-    
+    void resize()
+    {
+        T* newHeap;
+        currentSize += DEFAULT_SIZE;
+        newHeap = new T[currentSize];
+
+        for (size_t i = 1; i <= count; i++)
+            newHeap[i] = heap[i];
+        
+        delete[] heap;
+        heap = newHeap;
+        // don't delete new heap because newHeap is just a pointer, it'll delete the actual heap 
+    }
 };
 
 #endif
