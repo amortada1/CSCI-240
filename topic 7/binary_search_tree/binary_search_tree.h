@@ -65,6 +65,8 @@ private:
         else
             add(*child, item); // recursively call add to go down to the next node
     }
+
+    bool isLeaf(const BinaryTreeNode* node) const {return node->lchild == nullptr && node->rchild == nullptr;}
 };
 
 #endif
