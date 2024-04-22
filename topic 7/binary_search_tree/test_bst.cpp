@@ -14,6 +14,8 @@ int main(int argc, char const *argv[])
     b.add(3);
     b.add(2);
 
+    testTrue(b.getHeight() == 4, "test get height == 4");
+
     valuePtr = b.get(5);
     testTrue(valuePtr != nullptr && *valuePtr == 5, "test getting an existing value");
 

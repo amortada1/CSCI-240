@@ -47,15 +47,39 @@ public:
         } 
     }
 
+    size_t getHeight() const
+    {
+        if (root == nullptr) return 0;
+
+        return root->height();
+    }
+
     bool empty() const {return root == nullptr;}
 
 private:
     struct BinaryTreeNode
     {
         T item;
+
         BinaryTreeNode* parent;
         BinaryTreeNode* lchild;
         BinaryTreeNode* rchild;
+
+        bool isLeaf()
+        {
+            return lchild == nullptr && rchild == nullptr;
+        }
+
+        size_t height() const
+        {
+            size_t leftHeight{};
+            size_t rightHeight{};
+
+            leftHeight = (lchild == nullptr) ? 0 : lchild->height();
+            rightHeight = (rchild == nullptr) ? 0 : rchild->height();
+
+            return 1 + std::max(leftHeight, rightHeight);
+        }
     };
     
     BinaryTreeNode* root;
@@ -106,16 +130,11 @@ private:
 
         if (node == root)
         {
-            if(isLeaf(node))
-            {
-                root = nullptr;
-            }
-            else
-            {
-                root = (node->lchild == nullptr) ? node->rchild : node->lchild;
-            } 
+            root = (node->isLeaf())
+                ? nullptr
+                : (node->lchild == nullptr) ? node->rchild : node->lchild;
         }
-        else if (isLeaf(node))
+        else if (node->isLeaf())
         {
            ((parent->lchild == node) ? parent->lchild : parent->rchild) = nullptr;
         }
