@@ -134,15 +134,12 @@ private:
                 ? nullptr
                 : (node->lchild == nullptr) ? node->rchild : node->lchild;
         }
-        else if (node->isLeaf())
-        {
-           ((parent->lchild == node) ? parent->lchild : parent->rchild) = nullptr;
-        }
         else
         {
             child = (node->lchild == nullptr) ? node->rchild : node->lchild;
             ((parent->lchild == node) ? parent->lchild : parent->rchild) = child;
-            child->parent = parent;
+            if (!node->isLeaf())
+                child->parent = parent;
         }
 
         delete node;
