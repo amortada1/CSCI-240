@@ -21,16 +21,30 @@ public:
     {
         if (empty())
         {
-            root = new BinaryTreeNode{item, nullptr, nullptr};
+            root = new BinaryTreeNode{item, nullptr, nullptr, nullptr};
             return;
         }
         
         add(root, item);
     }
 
-    void remove (const T&) 
+    void remove (const T& item) 
     {
-        // TODO: implement
+        BinaryTreeNode* targetNode{find(root, item)};
+        BinaryTreeNode* replacementNode{};
+
+        if (targetNode == nullptr) return;
+
+        if (isLeaf(targetNode) || targetNode->lchild == nullptr) 
+        {
+            deleteNode(targetNode);
+        }
+        else
+        {
+            replacementNode = findRightMost(targetNode->lchild);
+            targetNode->item = replacementNode->item;
+            deleteNode(replacementNode);
+        } 
     }
 
     bool empty() const {return root == nullptr;}
@@ -39,19 +53,36 @@ private:
     struct BinaryTreeNode
     {
         T item;
+        BinaryTreeNode* parent;
         BinaryTreeNode* lchild;
         BinaryTreeNode* rchild;
     };
     
     BinaryTreeNode* root;
 
-    const T* get(BinaryTreeNode* root, const T& item) const
+    BinaryTreeNode* find(BinaryTreeNode* root, const T& item) const
     {
         if (root == nullptr) return nullptr;
-        if (item < root->item) return get(root->lchild, item);
-        if (item > root->item) return get(root->rchild, item);
+        if (item < root->item) return find(root->lchild, item);
+        if (item > root->item) return find(root->rchild, item);
 
-        return &root->item;
+        return root;
+    }
+
+    const T* get(BinaryTreeNode* root, const T& item) const
+    {
+        const BinaryTreeNode* node{find(root, item)};
+
+        return (node == nullptr) ? nullptr : &node->item;
+    }
+
+    BinaryTreeNode* findRightMost(BinaryTreeNode* root)
+    {
+        if (root == nullptr) return nullptr;
+
+        if (root->rchild == nullptr) return root;
+
+        return findRightMost(root->rchild);
     }
     
     void add(BinaryTreeNode* root, const T& item)
@@ -61,12 +92,42 @@ private:
 
         // *child is lchild or rchild's address
         if (*child == nullptr)
-            *child = new BinaryTreeNode{item, nullptr, nullptr};
+            *child = new BinaryTreeNode{item, root, nullptr, nullptr};
         else
             add(*child, item); // recursively call add to go down to the next node
     }
 
     bool isLeaf(const BinaryTreeNode* node) const {return node->lchild == nullptr && node->rchild == nullptr;}
+
+    void deleteNode(BinaryTreeNode* node)
+    {
+        BinaryTreeNode* parent{node->parent};
+        BinaryTreeNode* child{};
+
+        if (node == root)
+        {
+            if(isLeaf(node))
+            {
+                root = nullptr;
+            }
+            else
+            {
+                root = (node->lchild == nullptr) ? node->rchild : node->lchild;
+            } 
+        }
+        else if (isLeaf(node))
+        {
+           ((parent->lchild == node) ? parent->lchild : parent->rchild) = nullptr;
+        }
+        else
+        {
+            child = (node->lchild == nullptr) ? node->rchild : node->lchild;
+            ((parent->lchild == node) ? parent->lchild : parent->rchild) = child;
+            child->parent = parent;
+        }
+
+        delete node;
+    }
 };
 
 #endif
