@@ -16,6 +16,14 @@ enum Prober
     QUADRATIC
 };
 
+enum Status
+{
+    OCCUPIED,
+    EMPTY,
+    FREE
+};
+
+// type T must have the equality operator implemented
 
 template<typename T>
 class HashSet : public Set<T>
@@ -24,8 +32,8 @@ class HashSet : public Set<T>
 public:
 
     // constructors
-    HashSet(std::function<size_t(const T&)> hashcode) 
-        : count{}, currentSize{DEFAULT_SIZE}, store{new T[DEFAULT_SIZE], hashcodes{new size_t[DEFAULT_SIZE]}} 
+    HashSet(std::function<size_t(const T&)> hashcode, Prober prober) 
+        : prober{prober}, hashcode{hashcode} 
     {
         
     }
@@ -35,13 +43,13 @@ public:
     */
     void add(const T& item)
     {
-        if (count >= currentSize * LOAD_CAPACITY) resize();
+        // if (count >= currentSize * LOAD_CAPACITY) resize();
 
-        if (contains(item)) return;
+        // if (contains(item)) return;
 
-        // create a hashcode for the item and store it
-        store[++count] = item;
-        hashcodes[count] = hashcode(item);
+        // // create a hashcode for the item and store it
+        // store[++count] = item;
+        // hashcodes[count] = hashcode(item);
     }
 
     /** removes the item from the set
@@ -49,8 +57,7 @@ public:
     */
     T remove(const T& item)
     {
-        if (!contains(item)) throw std::runtime_error("item is not a member of the set");
-        
+        // if (!contains(item)) throw std::runtime_error("item is not a member of the set");
         
     }
 
@@ -60,13 +67,10 @@ public:
     /** returns true if the item is a member or false otherwise */
     bool contains(const T& item) const
     {
-        bool found{};
-        size_t itemhc = hashcode(item);
+        size_t index{probe(item, hashcode(item))};
 
-        for (size_t i = 0; i < count; ++i)
-            if (store[i] == itemhc)
-                found = true;
-        
+        // TODO: complete contains function
+
         return false;
     }
 
@@ -74,40 +78,48 @@ public:
     size_t size() const {return count;}
 
 private:
+
+    struct Element
+    {
+        T item;
+        Status status;
+    };
+
+private:
+    Prober prober;
     T* store;
-    size_t* hashcodes;
     size_t currentSize;
     size_t count;
     std::function<size_t(const T&)> hashcode;
-        
-    enum Status
-    {
-        OCCUPIED,
-        EMPTY,
-        FREE
-    };
+    Element* elements;
 
-    int linearProbe(size_t hcode)
+    int probe(const T& item, size_t hcode)
     {
-        for (size_t i = 0; i < NUM_ATTEMPTS; ++i)
-            if ((store[hcode + i].Status) % currentSize) // if status is not zero (occupied)
-                return (hcode + i) / currentSize;
+        return (prober == LINEAR) ? linearProbe(item, hcode) : quadraticProbe(item, hcode);
+    }
+
+
+    int linearProbe(const T& item, size_t hcode)
+    {
+        // for (size_t i = 0; i < NUM_ATTEMPTS; ++i)
+        //     if ((store[hcode + i].Status) % currentSize) // if status is not zero (occupied)
+        //         return (hcode + i) / currentSize;
     
         return -1;
     }
 
-    int quadraticProbe(size_t hcode)
+    int quadraticProbe(const T& item, size_t hcode)
     {
-        size_t i = 0;
-        size_t j = i;
-        while (i < NUM_ATTEMPTS) 
-        {
-            if ((store[hcode + j].Status) % currentSize) // if status is not zero (occupied)
-                return (hcode + j) / currentSize;
+        // size_t i = 0;
+        // size_t j = i;
+        // while (i < NUM_ATTEMPTS) 
+        // {
+        //     if ((store[hcode + j].Status) % currentSize) // if status is not zero (occupied)
+        //         return (hcode + j) / currentSize;
 
-            ++i;
-            j = i * i;
-        }
+        //     ++i;
+        //     j = i * i;
+        // }
 
         return -1;
     }
