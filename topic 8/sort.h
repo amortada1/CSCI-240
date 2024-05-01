@@ -88,6 +88,24 @@ public:
         }
     }
 
+    static size_t partition(uint32_t array[], size_t start, size_t end)
+    {
+        uint32_t pivotVal{array[end]};
+        size_t pivotPt{array[start]};
+
+        for (size_t i = start; i < end; ++i)
+        {
+            if (array[i] > pivotVal) continue;
+
+            swap(array[pivotPt], array[i]);
+            ++pivotPt;
+        }
+        
+        if (pivotPt != end) swap(array[pivotPt], array[end]);
+
+        return pivotPt;
+    }
+
 private:
     static void swap(T& a, T& b)
     {
@@ -96,7 +114,7 @@ private:
         b = temp;
     }
 
-    static size_t extrema(T array[], size_t start, size_t end, std::function<bool(const T&, const T&)> compare)
+    static size_t extrema(T array[], size_t start, size_t end, Comparator compare)
     {
         size_t extremeIdx{start};
         

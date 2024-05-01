@@ -9,6 +9,7 @@ void testBubbleSort();
 void testSelectionSort();
 void testInsertionSort();
 void testRadixSort();
+void testPartition();
 bool compare(uint32_t a, uint32_t b) {return a < b;}
 
 int main(int argc, char const *argv[])
@@ -16,7 +17,8 @@ int main(int argc, char const *argv[])
     // testBubbleSort();
     // testSelectionSort();
     // testInsertionSort();
-    testRadixSort();
+    // testRadixSort();
+    testPartition();
     
     return 0;
 }
@@ -110,4 +112,12 @@ void testRadixSort()
     }
     
     testPass("radix sort properly ordered");
+}
+
+void testPartition()
+{
+    TEST_ARRAY;
+    size_t p{Sort<uint32_t>::partition(array, 0, 7)};
+
+    testTrue(p == 6, "test partition on entire array");
 }
