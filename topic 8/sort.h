@@ -91,7 +91,7 @@ public:
     static size_t partition(uint32_t array[], size_t start, size_t end)
     {
         uint32_t pivotVal{array[end]};
-        size_t pivotPt{array[start]};
+        size_t pivotPt{start};
 
         for (size_t i = start; i < end; ++i)
         {
