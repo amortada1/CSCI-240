@@ -16,9 +16,9 @@ int main(int argc, char const *argv[])
     testInitialState();
     testAdd();
     testRemove();
-    // testPreOrder();
+    testPreOrder();
     // testInOrder();
-    testPostOrder();
+    // testPostOrder();
     // testLevelOrder();
     
     return 0;

@@ -1,6 +1,8 @@
 #include <cstddef>
 #include <algorithm>
 
+#include "linked_queue.h"
+
 #ifndef SPLAY_TREE_H
 #define SPLAY_TREE_H
 
@@ -8,94 +10,94 @@ template<typename T>
 class SplayTree
 {
 public:
-    // constructor
-    SplayTree() : root{nullptr}, count{} {}
-
-    // destructor
+    SplayTree() : root{nullptr} {}
     ~SplayTree() {}
 
-    // add
     void add(const T& item)
     {
-        if (empty())
-        {
-            root = new Node{item, nullptr, nullptr, nullptr};
-            return;
-        }
+        // if (empty())
+        // {
+        //     root = new Node{item, nullptr, nullptr, nullptr};
+        //     return;
+        // }
         
-        add(root, item);
-        ++count;
+        // add(root, item);
+        // ++count;
 
-        splay(find(root, item)); // need to splay newly added node
+        // splay(find(root, item)); // need to splay newly added node
+
+        Node* newNode{new Node{item}};
+
+        if (root == nullptr)
+            root = newNode;
+        insertNode(root, newNode);
+
+        splay(newNode);
     }
 
-    // remove
     void remove(const T& item)
     {
         Node* targetNode{find(root, item)};
-        splay(targetNode); // splay node of item we need to find
 
-        deleteNode(root);
-        --count;
+        if (targetNode != nullptr)
+        {
+            splay(targetNode); // splay node of item we need to find
+            deleteNode(root); 
+        }
+        
     }
 
-    // contains
-    bool contains(const T& item) const 
+    const T* get(const T& item)
     {
-        Node* targetNode{find(root, item)};
-        if (targetNode == nullptr) return false;
-        return true;
+        Node* node{find(root, item)};
+
+        if (node != nullptr)
+        {
+            splay(node);
+            return &node->item;
+        }
+        return nullptr;
     }
 
-    // size
-    size_t size() const {return count;}
+    bool contains(const T& item) const {return get(item) != nullptr;}
 
-    // empty
-    bool empty() const {return count == 0;}
+    size_t size() const {return getSize(root);}
 
-    /* functions to perform tree traversal and return pointer to a heap-bound array
-       storing the items in the correct order
-    */
-    // preorder
+    bool empty() const {return root == nullptr;}
+
     T* preOrder() 
     {
-        T* array{new T[count]};
-
-        for (size_t i = 0; i < count; ++i)
-            array[i] = preOrder(root);
-    
+        T* array{new T[getSize(root)]};
+        preOrder(root, array, 0);
         return array;
     }
 
-    // inorder
     T* inOrder() 
     {
-        T* array{new T[count]};
+        T* array{new T[getSize(root)]};
 
-        for (size_t i = 0; i < count; ++i)
-            array[i] = inOrder(root);
+        // for (size_t i = 0; i < count; ++i)
+        //     array[i] = inOrder(root);
 
         return array;
     }
 
-    // postOrder
     T* postOrder() 
     {
-        T* array{new T[count]};
+        T* array{new T[getSize(root)]};
 
-        for (size_t i = 0; i < count; ++i)
-            array[i] = postOrder(root);
+        // for (size_t i = 0; i < count; ++i)
+        //     array[i] = postOrder(root);
 
         return array;
     }
 
-    // levelOrder
     T* levelOrder() 
     {
-        T* array{new T[count]};
+        T* array{new T[getSize(root)]};
 
-        for (size_t i = 0; i < count; ++i)
-            array[i] = levelOrder(root);
+        // for (size_t i = 0; i < count; ++i)
+        //     array[i] = levelOrder(root);
 
         return array;
     }
@@ -124,70 +126,151 @@ private:
     };
     
     Node* root;
-    size_t count;
 
     // right rotation
-    Node* zig(Node* nodeN) 
+    void zig(Node* pivot) 
     {
-        Node* nodeC{nodeN->lchild};
-        nodeN->lchild = nodeC->rchild;
-        nodeC->rchild = nodeN;
-        return nodeC;
+        Node* newRoot = pivot->lchild;
+
+        if (newRoot)
+        {
+            pivot->lchild = newRoot->rchild;
+            if (newRoot->rchild) newRoot->rchild->parent = pivot;
+            newRoot->parent = pivot->parent;
+        }
+
+        if (!pivot->parent)
+            root = newRoot;
+        else if (pivot == pivot->parent->rchild)
+            pivot->parent->rchild = newRoot;
+        else
+            pivot->parent->lchild = newRoot;
+        
+        if (newRoot) newRoot->rchild = pivot;
+
+        pivot->parent = newRoot;
     }
 
     // left rotation
-    Node* zag(Node* nodeN) 
+    void zag(Node* pivot) 
     {
-        Node* nodeC{nodeN->rchild};
-        nodeN->rchild = nodeC->lchild;
-        nodeC->lchild = nodeN;
-        return nodeC;
-    }
+        Node* newRoot = pivot->rchild;
 
-    // splay operation (bringing node to root)
-    Node* splay(Node* node)
-    {
-        // check if node is root
-        if (node == root) return root;
-
-        // check if node is a child of root
-        if (node == root->lchild || node == root->rchild)
+        if (newRoot)
         {
-            (node == root->lchild) ? node = zig(root) : node = zag(root); 
+            pivot->rchild = newRoot->lchild;
+
+            if (newRoot->lchild)
+                newRoot->lchild->parent = pivot;
+
+            newRoot->parent = pivot->parent;
         }
 
-        // four conditions
-        (node == root->lchild->lchild) ? node = zig(zig(node->parent)) : 
-        (node == root->rchild->rchild) ? node = zag(zag(node->parent)) :
-        (node == root->rchild->lchild) ? node = zig(zag(node->parent)) :
-        (node == root->lchild->rchild) ? node = zag(zig(node->parent)) : splay(node);
+        if (!pivot->parent)
+            root = newRoot;
+        else if (pivot == pivot->parent->lchild)
+            pivot->parent->lchild = newRoot;
+        else
+            pivot->parent->rchild = newRoot;
 
-        return splay(node);
+        if (newRoot) newRoot->lchild = pivot;
+
+        pivot->parent = newRoot;
     }
 
-    void add(Node* root, const T& item)
+    void splay(Node* node)
     {
-        // storing address of lchild or rchild in child's pointer's pointer
-        Node** child {(item <= root->item) ? &root->lchild : &root->rchild};
+        while (node != root)
+        {
+            Node* parent = node->parent;
+            Node* grandparent = parent->parent;
 
-        // *child is lchild or rchild's address
-        if (*child == nullptr)
-            *child = new Node{item, root, nullptr, nullptr};
+            // zig: no grandparent
+            if (grandparent == nullptr)
+            {
+                if (node == parent->lchild) zig(parent);
+                else zag(parent);
+            }
+
+            else // zig-zig or zig-zag: has grandparent
+            {
+                bool nodeIsLeftChild = (node == parent->lchild);
+                bool parentIsLeftChild = (parent == grandparent->lchild);
+
+                if (nodeIsLeftChild == parentIsLeftChild) // right-right
+                {
+                    if (nodeIsLeftChild) zig(grandparent);
+                    else zag(grandparent);
+                }
+                else // right-left
+                {
+                    if (nodeIsLeftChild) zig(parent);
+                    else zag(parent);
+                }
+            }
+        }
+    }
+
+    const T* get(Node* root, const T& item) const
+    {
+        Node* node(find(root, item));
+
+        if(node != nullptr)
+        {
+            splay(node);
+            return &node->item;
+        }
+
+        return nullptr;
+    }
+
+    size_t getSize(Node* node) const
+    {
+        if (node == nullptr)
+            return 0;
         else
-            add(*child, item); // recursively call add to go down to the next node
+            return 1 + getSize(node->lchild) + getSize(node->rchild);
+    }
+
+    void insertNode(Node* root, Node* newNode)
+    {
+        if (newNode->item < root->item)
+        {
+            if (root->lchild == nullptr)
+            {
+                root->lchild = newNode;
+                newNode->parent = root;
+            } 
+            else 
+            {
+                insertNode(root->lchild, newNode);
+            }
+        }
+        else
+        {
+            if (root->rchild == nullptr)
+            {
+                root->rchild = newNode;
+                newNode->parent = root;
+            }
+            else
+            {
+                insertNode(root->rchild, newNode);
+            }
+        }
     }
 
     // private versions of tree traversal functions
-    T preOrder(Node* node) 
+    T preOrder(Node* node, T* array, size_t index) 
     {
-        // if (node == nullptr) return;
-
-        // process root -> lchild -> rchild
-        return node->item;
-
-        inOrder(node->lchild);
-
-        inOrder(node->rchild);
+        if (node != nullptr)
+        {
+            // process root -> lchild -> rchild
+            array[index++] = node->item;
+            preOrder(node->lchild, array, index);
+            preOrder(node->rchild, array, index);
+        }
+        return index;
     }
 
     T inOrder(Node* node) 
@@ -196,9 +279,7 @@ private:
         
         // process lchild -> root -> rchild
         inOrder(node->lchild);
-
         return node->item;
-
         inOrder(node->rchild);
     }
 
@@ -207,11 +288,8 @@ private:
         // if (node == nullptr) return;
 
         // process lchild -> rchild -> root
-
         inOrder(node->lchild);
-
         inOrder(node->rchild);
-
         return node->item;
     }
 
