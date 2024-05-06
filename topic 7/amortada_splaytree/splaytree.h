@@ -79,7 +79,7 @@ public:
     }
 
     // postOrder
-    T* postorder() 
+    T* postOrder() 
     {
         T* array{new T[count]};
 
@@ -90,7 +90,7 @@ public:
     }
 
     // levelOrder
-    T* levelorder() 
+    T* levelOrder() 
     {
         T* array{new T[count]};
 
@@ -180,7 +180,7 @@ private:
     // private versions of tree traversal functions
     T preOrder(Node* node) 
     {
-        if (node == nullptr) return;
+        // if (node == nullptr) return;
 
         // process root -> lchild -> rchild
         return node->item;
@@ -192,7 +192,7 @@ private:
 
     T inOrder(Node* node) 
     {
-        if (node == nullptr) return;
+        // if (node == nullptr) return;
         
         // process lchild -> root -> rchild
         inOrder(node->lchild);
@@ -204,7 +204,7 @@ private:
 
     T postOrder(Node* node) 
     {
-        if (node == nullptr) return;
+        // if (node == nullptr) return;
 
         // process lchild -> rchild -> root
 

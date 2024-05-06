@@ -18,7 +18,7 @@ int main(int argc, char const *argv[])
     testRemove();
     // testPreOrder();
     // testInOrder();
-    // testPostOrder();
+    testPostOrder();
     // testLevelOrder();
     
     return 0;
@@ -68,6 +68,22 @@ void testPreOrder()
     SETUP;
 
     std::cout << "Testing preOrder() function..." << std::endl;
+
+    s.add(5);
+    s.add(10);
+    s.add(0);
+    s.add(19);
+    s.add(3);
+    s.add(2);
+
+    int* array = s.preOrder();
+
+    for (size_t i = 0; i < 6; ++i)
+    {
+        std::cout << array[i] << " ";
+    }
+    
+    std::cout << std::endl;
 }
 
 void testInOrder()
@@ -82,6 +98,22 @@ void testPostOrder()
     SETUP;
 
     std::cout << "Testing postOrder() function..." << std::endl;
+
+    s.add(5);
+    s.add(10);
+    s.add(0);
+    s.add(19);
+    s.add(3);
+    s.add(2);
+
+    int* array = s.postOrder();
+
+    for (size_t i = 0; i < 6; ++i)
+    {
+        std::cout << array[i] << " ";
+    }
+    
+    std::cout << std::endl;
 }
 
 void testLevelOrder()
