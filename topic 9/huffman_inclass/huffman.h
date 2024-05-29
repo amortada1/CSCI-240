@@ -14,6 +14,7 @@ struct Node
     size_t freq{};
     Node* lchild{};
     Node* rchild{};
+    bool terminal{}; // false by default
 };
 
 struct triple

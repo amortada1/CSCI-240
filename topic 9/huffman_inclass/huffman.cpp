@@ -51,12 +51,15 @@ void HuffmanCompressor::buildTree()
     while (pqueue.size() > 1)
     {
         node = new Node;
+
         node->freq = pqueue.top()->freq;
         node->lchild = pqueue.top();
         pqueue.pop();
+
         node->freq += pqueue.top()->freq;
         node->rchild = pqueue.top();
         pqueue.pop();
+
         pqueue.emplace(node);
     }
 
@@ -67,7 +70,7 @@ void HuffmanCompressor::buildTree()
 void HuffmanCompressor::loadPqueue()
 {
     for (auto p: map)
-        pqueue.emplace(new Node{p.first, p.second, nullptr, nullptr});
+        pqueue.emplace(new Node{p.first, p.second, nullptr, nullptr, true});
 }
 
 void HuffmanCompressor::buildTable()
@@ -86,7 +89,10 @@ void HuffmanCompressor::traverse(const Node* node)
 {
     static uint64_t code;
     static uint8_t depth;
-    if (node->symbol != 0)
+    
+    if (!node) return;
+
+    if (node->terminal != 0)
     {
         table.push_back({node->symbol, depth, code})
         return;
