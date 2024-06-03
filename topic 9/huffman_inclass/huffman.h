@@ -11,13 +11,13 @@
 struct Node
 {
     char symbol;
-    size_t freq{};
+    uint64_t freq{};
     Node* lchild{};
     Node* rchild{};
     bool terminal{}; // false by default
 };
 
-struct triple
+struct Triple
 {
     char symbol;
     uint8_t bitQty;
@@ -36,13 +36,23 @@ struct HuffmanCompressor
     void buildTable();
     size_t height(const Node*);
     void traverse(const Node*);
+    void storeSymbolQty(std::ofstream&);
+    void storeTableSize(std::ofstream&);
+    void storeTable(std::ofstream&);
+    void compress(BitArray&);
+    void storeCompressedData(BitArray&, std::ofstream&);
+
+    // bool isValidPqueue();
 
     std::string srcPath;
     std::string dstPath;
+    uint32_t symbolQty;
+    uint32_t tableSize;
+    uint64_t bitQty;
     Map map;
     PQueue pqueue;
     Node* root;
-    std::vector<triple> table;
+    std::vector<Triple> table;
 };
 
 #endif
