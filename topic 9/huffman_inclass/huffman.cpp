@@ -1,9 +1,9 @@
 #include <fstream>
 
 #include "huffman.h"
-#include "bit_array.h"
 
 #define BYTE_MASK 0xFFull
+#define BUFFER_SIZE 4096
 
 HuffmanCompressor::HuffmanCompressor(const std::string& src, const std::string& dst)
     : srcPath{src}, dstPath{dst}, symbolQty{}, tableSize{}, bitQty{}, pqueue{[](Node* a, Node* b){return a->freq > b->freq;}}
@@ -45,7 +45,6 @@ HuffmanCompressor::HuffmanCompressor(const std::string& src, const std::string& 
 
 void HuffmanCompressor::buildMap()
 {
-    #define BUFFER_SIZE 4096
     std::ifstream in(srcPath);
     char buffer[BUFFER_SIZE];
 
@@ -118,7 +117,7 @@ void HuffmanCompressor::traverse(const Node* node)
 
     if (node->terminal)
     {
-        table.push_back({node->symbol, depth, code, node->freq});
+        table.push_back({node->symbol, depth, code});
         tableSize += (depth >> 3) + (((depth & 0b111) == 0) ? 0u : 1u);
         bitQty += depth * node->freq;
     }
@@ -136,13 +135,13 @@ void HuffmanCompressor::traverse(const Node* node)
 void HuffmanCompressor::storeSymbolQty(std::ofstream& out)
 {
     char* bytes{reinterpret_cast<char*>(&symbolQty)};
-    out.write(bytes, sizeof symbolQty);
+    out.write(bytes, sizeof(symbolQty));
 }
 
 void HuffmanCompressor::storeTableSize(std::ofstream& out)
 {
     char* bytes{reinterpret_cast<char*>(&tableSize)};
-    out.write(bytes, sizeof tableSize);
+    out.write(bytes, sizeof(tableSize));
 }
 
 void HuffmanCompressor::storeTable(std::ofstream& out)
@@ -159,13 +158,42 @@ void HuffmanCompressor::storeTable(std::ofstream& out)
     }
 }
 
-void HuffmanCompressor::compress(BitArray&)
-{}
+void HuffmanCompressor::compress(BitArray& ba)
+{
+    size_t idx{};
+    std::ifstream in(srcPath);
+    char buffer[BUFFER_SIZE];
+    const Triple* trip{};
+    size_t i{};
+    size_t j{};
+
+    while (true)
+    {
+        in.read(buffer, BUFFER_SIZE);
+
+        if (in.gcount() == 0) break;
+
+        for (i = 0; i < in.gcount(); ++i)
+        {
+            trip = lookupSymbol(buffer[i]);
+            for (j = 0; j < trip->bitQty; ++j)
+                ba.setBit(idx++, trip->code & (1 << j));
+        }   
+    }
+}
 
 void HuffmanCompressor::storeCompressedData(BitArray& ba, std::ofstream& out)
 {
     const char* ptr{reinterpret_cast<const char*>(ba.getArray())};
     out.write(ptr, ba.getByteQty());
+}
+
+const Triple* HuffmanCompressor::lookupSymbol(char s)
+{
+    for (const Triple& t : table)
+        if (t.symbol == s) return &t;
+
+    return nullptr;
 }
 
 // bool HuffmanCompressor::isValidPqueue()

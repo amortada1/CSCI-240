@@ -5,6 +5,8 @@
 #include <functional>
 #include <cstdint>
 
+#include "bit_array.h"
+
 #ifndef HUFFMAN_H
 #define HUFFMAN_H
 
@@ -41,6 +43,7 @@ struct HuffmanCompressor
     void storeTable(std::ofstream&);
     void compress(BitArray&);
     void storeCompressedData(BitArray&, std::ofstream&);
+    const Triple* lookupSymbol(char);
 
     // bool isValidPqueue();
 
