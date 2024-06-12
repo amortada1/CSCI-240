@@ -23,6 +23,11 @@ struct Hash
     size_t operator()(const Node* n) const {return n->state.board;}
 };
 
+struct Equality
+{
+    bool operator()(const Node* a, const Node* b) const {return a->state == b->state;}
+};
+
 class UniformCostSearch
 {
 public:
@@ -33,7 +38,7 @@ private:
     Node* createNode(Problem, Node*, const State&) const;
     void createPath(const Node*) const;
 
-    std::unordered_set<Node*, Hash> explored;
+    std::unordered_set<Node*, Hash, Equality> explored;
     std::priority_queue<Node*, std::vector<Node*>, std::function<bool(const Node*, const Node*)>> frontier;
     mutable std::vector<State> shortestPath;
 };
